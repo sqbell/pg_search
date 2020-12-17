@@ -5,14 +5,15 @@ require 'digest'
 module PgSearch
   class Configuration
     class Column
-      attr_reader :weight, :name
+      attr_reader :weight, :name, :transformation
 
-      def initialize(column_name, weight, model)
+      def initialize(column_name, weight, model, transformation)
         @name = column_name.to_s
         @column_name = column_name.to_s
         @weight = weight
         @model = model
         @connection = model.connection
+        @transformation = transformation
       end
 
       def full_name
@@ -20,7 +21,11 @@ module PgSearch
       end
 
       def to_sql
-        "coalesce(#{expression}::text, '')"
+        if transformation
+          transformation.sub(":#{name}", "coalesce(#{expression}::text, '')")
+        else
+          "coalesce(#{expression}::text, '')"
+        end
       end
 
       private

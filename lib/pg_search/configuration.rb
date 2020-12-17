@@ -31,7 +31,7 @@ module PgSearch
       return [] unless options[:against]
 
       Array(options[:against]).map do |column_name, weight|
-        Column.new(column_name, weight, model)
+        Column.new(column_name, weight, model, options.dig(:transform, column_name))
       end
     end
 
@@ -84,7 +84,7 @@ module PgSearch
     end
 
     VALID_KEYS = %w[
-      against ranked_by ignoring using query associated_against order_within_rank
+      against ranked_by ignoring using query associated_against order_within_rank transform
     ].map(&:to_sym)
 
     VALID_VALUES = {
